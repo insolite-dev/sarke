@@ -1,32 +1,49 @@
 /*
  * Just playing around here.
  *
- * The current code is an echo server that allows multiple connections.
+ * Implements simple broadcast server that allows mutli-connection.
  */
 
 use tokio::{
     io::{AsyncBufReadExt, AsyncWriteExt, BufReader},
     net::TcpListener,
+    sync::broadcast,
 };
 
 #[tokio::main]
 async fn main() {
     let listener = TcpListener::bind("localhost:8080").await.unwrap();
+    let (tx, _rx) = broadcast::channel(10);
+
     loop {
-        let (mut socket, _) = listener.accept().await.unwrap();
+        let (mut socket, adress) = listener.accept().await.unwrap();
+        let tx = tx.clone();
+        let mut rx = tx.subscribe();
+
         tokio::spawn(async move {
             let (reader, mut writer) = socket.split();
-            let mut bufreader = BufReader::new(reader);
+            let mut reader = BufReader::new(reader);
             let mut line = String::new();
 
             loop {
-                let bytes_read = bufreader.read_line(&mut line).await.unwrap();
-                if bytes_read == 0 {
-                    break;
-                }
+                tokio::select! {
+                    result = reader.read_line(&mut line) => {
+                        if result.unwrap() == 0 {
+                            break;
+                        }
 
-                writer.write_all(line.as_bytes()).await.unwrap();
-                line.clear();
+                        let message = format!("From: {} | {}", adress, line.clone());
+                        tx.send((message, adress)).unwrap();
+                        line.clear();
+                    }
+
+                    result = rx.recv() => {
+                        let (msg, other_adress) = result.unwrap();
+                        if adress != other_adress {
+                           writer.write_all(msg.as_bytes()).await.unwrap();
+                        }
+                    }
+                }
             }
         });
     }
