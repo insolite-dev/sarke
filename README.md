@@ -1,5 +1,5 @@
 <p align="center">
- <img width="150" src="https://github.com/insolite-dev/sarke-web/assets/59066341/4d5f6092-9703-42f9-af64-7c2784fb1075" alt="Sarke Logo">
+ <img width="150" src="https://github.com/insolite-dev/sarke-web/assets/59066341/25c2d34e-34fc-4785-9cd8-6f3ca0452751" alt="Sarke Logo">
 </p>
 
 ---
