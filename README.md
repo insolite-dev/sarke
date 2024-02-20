@@ -6,6 +6,7 @@
 
 <p align="center">
   <b>
-     ... Documentation will be ready soon ...
+     ... Documentation will be ready soon ... <br/>
+     Till then, you can ask anything to our <a href="https://chat.openai.com/g/g-8a7hQNvGa-sarke">Sarke GPT</a>
   </b>
 </p>
